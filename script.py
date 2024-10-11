@@ -1,5 +1,13 @@
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from datacenter.models import Schoolkid, Mark, Teacher, Subject, Lesson, Chastisement, Commendation
+from datacenter.models import (
+    Chastisement,
+    Commendation,
+    Lesson,
+    Mark,
+    Schoolkid,
+    Subject,
+    Teacher
+    )
+
 import random
 
 
@@ -27,23 +35,24 @@ def remove_chastisements(name_kid):
     bad_comment.delete()
     
 
-def create_commendation(name_kid, lesson):   
-    
+def create_commendation(name_kid, lesson):
     subject = Subject.objects.filter(title__contains=lesson, year_of_study=kid.year_of_study).first()
-    if subject is None:
-        print(f'Предмет "{lesson}" не найден для ученика {name_kid}.')
-        return
     last_lesson = Lesson.objects.filter(year_of_study=kid.year_of_study, group_letter=kid.group_letter,
                                         subject=subject).order_by('-date').first()
+    if subject or last_lesson is None:
+        print(f'Предмет "{lesson}" не найден для ученика {name_kid}.')
+        return
     Commendation.objects.create(text=random.choice(praise), created=last_lesson.date, schoolkid=kid,
                                 subject=last_lesson.subject, teacher=last_lesson.teacher)
                    
-kid = Schoolkid.objects.get(full_name__contains=name_kid)
 
-def safe_execute(func, *args, **kwargs):
+
+def get_schoolkid(func, *args, **kwargs):
+    kid = Schoolkid.objects.get(full_name__contains=name_kid)
     try:
         return func(*args, **kwargs)
     except Schoolkid.MultipleObjectsReturned:
         print(f'Найдено много учеников. Введи полное имя.')
     except Schoolkid.DoesNotExist:
         print('Неверное имя')
+    raise Exception()
