@@ -33,30 +33,28 @@ praise = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гораздо
                'Ты растешь над собой!', 'Ты многое сделал, я это вижу!', 'Теперь у тебя точно все получится!']                            
 
 
-def fix_marks(name_kid):   
-    kid = Schoolkid.objects.get(full_name__contains=name_kid)    
-    marks = Mark.objects.filter(schoolkid=kid, points__lt=4).update(points=5)
+def fix_marks(kid):
+    Mark.objects.filter(schoolkid=kid, points__lt=4).update(points=5)
     
 
-def remove_chastisements(name_kid):  
-    kid = Schoolkid.objects.get(full_name__contains=name_kid)
+def remove_chastisements(kid):
     bad_comment = Chastisement.objects.filter(schoolkid=kid)
     bad_comment.delete()
     
 
-def create_commendation(name_kid, lesson):
+def create_commendation(kid, lesson):
     subject = Subject.objects.filter(title__contains=lesson, year_of_study=kid.year_of_study).first()
     last_lesson = Lesson.objects.filter(year_of_study=kid.year_of_study, group_letter=kid.group_letter,
                                         subject=subject).order_by('-date').first()
     if subject or last_lesson is None:
-        print(f'Предмет "{lesson}" не найден для ученика {name_kid}.')
+        print(f'Предмет "{lesson}" не найден для ученика {kid}.')
         return
     Commendation.objects.create(text=random.choice(praise), created=last_lesson.date, schoolkid=kid,
                                 subject=last_lesson.subject, teacher=last_lesson.teacher)
                    
 
 
-def get_schoolkid(func, *args, **kwargs):
+def get_schoolkid(func, name_kid, *args, **kwargs):
     kid = Schoolkid.objects.get(full_name__contains=name_kid)
     try:
         return func(*args, **kwargs)
@@ -70,9 +68,9 @@ def get_schoolkid(func, *args, **kwargs):
 
 ## Использование
 Ввести в терминал соответствующие команды ниже:<br>
-### ```get_schoolkid(fix_marks, name_kid):```
+### ```get_schoolkid(fix_marks, kid):```
 - функция позволит изменить все двойки и тройки на пятерки. Вместо ```name kid``` вписать фамилию и имя. <br>
-### ```get_schoolkid(remove_chastisements, name_kid)``` ### 
+### ```get_schoolkid(remove_chastisements, kid)``` ### 
 - функция позволит удалить все замечания учителя. Вместо ```name kid``` вписать фамилию и имя. <br>
-### ```get_schoolkid(create_commendation, name_kid, lesson)``` ### 
+### ```get_schoolkid(create_commendation, kid, lesson)``` ### 
 - функция оставит похвалу на последнем уроке. Вместо ```name_kid``` вписать фамилию и имя, вместо ```lesson``` вписать урок.
