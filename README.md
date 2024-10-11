@@ -57,7 +57,7 @@ def create_commendation(kid, lesson):
 def get_schoolkid(func, name_kid, *args, **kwargs):
     kid = Schoolkid.objects.get(full_name__contains=name_kid)
     try:
-        return func(*args, **kwargs)
+        return kid, func(*args, **kwargs)
     except Schoolkid.MultipleObjectsReturned:
         print(f'Найдено много учеников. Введи полное имя.')
     except Schoolkid.DoesNotExist:
@@ -69,8 +69,8 @@ def get_schoolkid(func, name_kid, *args, **kwargs):
 ## Использование
 Ввести в терминал соответствующие команды ниже:<br>
 ### ```get_schoolkid(fix_marks, kid):```
-- функция позволит изменить все двойки и тройки на пятерки. Вместо ```name kid``` вписать фамилию и имя. <br>
+- функция позволит изменить все двойки и тройки на пятерки. Вместо ```kid``` вписать фамилию и имя. <br>
 ### ```get_schoolkid(remove_chastisements, kid)``` ### 
-- функция позволит удалить все замечания учителя. Вместо ```name kid``` вписать фамилию и имя. <br>
+- функция позволит удалить все замечания учителя. Вместо ```kid``` вписать фамилию и имя. <br>
 ### ```get_schoolkid(create_commendation, kid, lesson)``` ### 
-- функция оставит похвалу на последнем уроке. Вместо ```name_kid``` вписать фамилию и имя, вместо ```lesson``` вписать урок.
+- функция оставит похвалу на последнем уроке. Вместо ```kid``` вписать фамилию и имя, вместо ```lesson``` вписать урок.

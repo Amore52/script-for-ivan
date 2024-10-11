@@ -48,7 +48,7 @@ def create_commendation(kid, lesson):
 def get_schoolkid(func, name_kid, *args, **kwargs):
     kid = Schoolkid.objects.get(full_name__contains=name_kid)
     try:
-        return func(*args, **kwargs)
+        return kid, func(*args, **kwargs)
     except Schoolkid.MultipleObjectsReturned:
         print(f'Найдено много учеников. Введи полное имя.')
     except Schoolkid.DoesNotExist:
