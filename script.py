@@ -1,3 +1,5 @@
+import random
+
 from datacenter.models import (
     Chastisement,
     Commendation,
@@ -8,11 +10,8 @@ from datacenter.models import (
     Teacher
     )
 
-import random
 
-
-
-praise = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гораздо лучше, чем я ожидал!', 'Ты меня приятно удивил!',
+praises = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гораздо лучше, чем я ожидал!', 'Ты меня приятно удивил!',
                'Великолепно!', 'Прекрасно!', 'Ты меня очень обрадовал!', 'Именно этого я давно ждал от тебя!',
                'Сказано здорово – просто и ясно!', 'Ты, как всегда, точен!', 'Очень хороший ответ!', 'Талантливо!',
                'Ты сегодня прыгнул выше головы!', 'Я поражен!', 'Уже существенно лучше!', 'Потрясающе!',
@@ -29,15 +28,15 @@ def fix_marks(kid):
     
 
 def remove_chastisements(kid):
-    bad_comment = Chastisement.objects.filter(schoolkid=kid)
-    bad_comment.delete()
+    bad_comments = Chastisement.objects.filter(schoolkid=kid)
+    bad_comments.delete()
     
 
 def create_commendation(kid, lesson):
     subject = Subject.objects.filter(title__contains=lesson, year_of_study=kid.year_of_study).first()
     last_lesson = Lesson.objects.filter(year_of_study=kid.year_of_study, group_letter=kid.group_letter,
                                         subject=subject).order_by('-date').first()
-    if subject or last_lesson is None:
+    if subject is None or last_lesson is None:
         print(f'Предмет "{lesson}" не найден для ученика {kid}.')
         return
     Commendation.objects.create(text=random.choice(praise), created=last_lesson.date, schoolkid=kid,
